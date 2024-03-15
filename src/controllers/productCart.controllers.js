@@ -7,7 +7,13 @@ require ('../models/index')
 
 const getAll = catchError(async(req, res) => {
     const results = await ProductCart.findAll({
-         include: [ Product, User, image ],
+         include: [
+             User, 
+             {
+            model: Product,
+            include: image
+        } 
+        ],
          where: { userId: req.user.id },
         });
     return res.json(results);
@@ -24,7 +30,14 @@ const create = catchError(async(req, res) => {
 
 const getOne = catchError(async(req, res) => {
     const { id } = req.params;
-    const result = await ProductCart.findByPk(id, { include: [ Product, User, Image ]});
+    const result = await ProductCart.findByPk(id, { include: [
+             User, 
+             {
+             model: Product,
+             include: image
+            } 
+        ],
+    });
     if(!result) return res.sendStatus(404);
     return res.json(result);
 });
