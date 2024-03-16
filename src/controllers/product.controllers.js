@@ -22,14 +22,8 @@ const getOne = catchError(async(req, res) => {
     return res.json(result);
 });
 
-//Original function remove
-/*const remove = catchError(async(req, res) => {
-    const { id } = req.params;
-    await Product.destroy({ where: {id} });
-    return res.sendStatus(204);
-});*/
 
-//second funtion remove
+// funtion remove elimina el producto completo
 const remove = catchError(async (req, res) => {
     const { id } = req.params;
 
