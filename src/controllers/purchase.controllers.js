@@ -2,46 +2,34 @@ const catchError = require('../utils/catchError');
 const Purchase = require('../models/Purchase');
 const Product = require('../models/Product');
 const ProductCart = require('../models/ProductCart');
+const image = require('../models/Image');
 
 const getAll = catchError(async(req, res) => {
     const results = await Purchase.findAll({
-        include: [ Product ],
+        include: [ 
+            {
+                model: Product,
+                include: image
+                }
+         ],
         where: { userId: req.user.id }
     });
     return res.json(results);
 });
 
 const create = catchError(async(req, res) => {
-    const userId = req.user.id;
-
-    // Obtener los productos en el carrito del usuario
-    const productsInCart = await ProductCart.findAll({ where: { userId } });
-
-    if (productsInCart.length === 0) {
-        return res.status(400).json({ message: "No hay productos en el carrito para realizar la compra." });
-    }
-
-    // Crear una nueva compra
-    const purchase = await Purchase.create({ userId });
-
-    // Agregar cada producto del carrito a la compra
-    for (const productCart of productsInCart) {
-        const { productId, quantity } = productCart;
-        // Agregar el producto a la compra con la cantidad correspondiente
-        await purchase.addProduct(productId, { through: { quantity } });
-    }
-
-    // Vaciar el carrito después de la compra
-    await ProductCart.destroy({ where: { userId } });
-
-    return res.status(201).json(purchase);
-});
-/*const create = catchError(async(req, res) => {
-    const result = await Purchase.create(req.body);
-    return res.status(201).json(result);
+    const productsCart = await ProductCart.findAll({
+        where: { userId: req.user.id },
+        attributes: [ 'quantity', 'userId', 'productId' ],
+        raw: true,
+    });
+    const purchases = await Purchase.bulkCreate(productsCart);
+    await ProductCart.destroy({ where: { userId: req.user.id }})
+    return res.json(purchases);
 });
 
-const getOne = catchError(async(req, res) => {
+
+/*const getOne = catchError(async(req, res) => {
     const { id } = req.params;
     const result = await Purchase.findByPk(id);
     if(!result) return res.sendStatus(404);

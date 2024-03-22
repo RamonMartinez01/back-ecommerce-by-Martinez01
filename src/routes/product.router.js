@@ -9,8 +9,11 @@ productRouter.route('/products')
     .post(create)
     .get(getProductsByCategory)
 
-productRouter.route('/updateimage/:id')
-    .put(upload.single('imageUrl'), updateProductImage)
+    productRouter.route('/updateproductimage/:id')
+    .put(
+        upload.any('imageUrl', 'imageUrl2', 'imageUrl3', 'imageUrl4' ),
+        updateProductImage
+    )
 
 productRouter.route('/products/:id')
     .get(getOne)

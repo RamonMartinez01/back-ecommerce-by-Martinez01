@@ -59,7 +59,6 @@ if(!isValid) return res.status(401).json({ error: "user not found" });
             process.env.TOKEN_SECRET,
             { expiresIn: '1d' }
     )
-
     return res.json({ user, token });
 })
 
