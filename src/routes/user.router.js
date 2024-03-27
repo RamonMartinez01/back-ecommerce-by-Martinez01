@@ -12,7 +12,7 @@ userRouter.route('/users/login')
     .post(login)
 
 userRouter.route('/users/:id')
-    .get(verifyJWT, getOne)
+    .get(getOne)
     .delete(verifyJWT, remove)
     .put(verifyJWT, update);
 
